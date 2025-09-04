@@ -61,7 +61,13 @@
       "profile": "https://github.com/januszgrze",
       "contributions": [
         "review"
-  ]
+  ]    "review"
+      ]
+  "projectName": "bitcoin-circle-stark",
+  "projectOwner": "Bitcoin-Wildlife-Sanctuary",
+  "files": [
+    "README.md"
+  ],
     },
     {
       "login": "PayneJoe",
