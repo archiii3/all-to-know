@@ -43,7 +43,12 @@
       "contributions": [
         "maintenance"
       ]
-    },
+      ]
+  "projectName": "bitcoin-circle-stark",
+  "projectOwner": "Bitcoin-Wildlife-Sanctuary",
+  "files": [
+      "login": "januszgrze",
+      "name": "janusz",
     {
       "login": "dependabot",
       "name": "Dependabot",
