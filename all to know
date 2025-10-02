@@ -81,10 +81,11 @@
   "projectOwner": "Bitcoin-Wildlife-Sanctuary",
   "files": [
     "README.md"
-  ],
-    },
-    {
-      "login": "PayneJoe",
+  ],    ]
+  "projectName": "bitcoin-circle-stark",
+  "projectOwner": "Bitcoin-Wildlife-Sanctuary",
+  "files": [
+      "login": "januszgrze",yneJoe",
       "name": "PayneJoe",
       "avatar_url": "https://avatars.githubusercontent.com/u/6851723?v=4",
       "profile": "https://github.com/PayneJoe",
