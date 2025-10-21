@@ -32,8 +32,10 @@
       "profile": "https://github.com/victorkstarkware",
       "contributions": [
         "code"
-      ]projectName": "bitcoin-circle-stark",
-  projectName": "bitcoin-circle-stark",
+      ]   ]
+  "projectName": "bitcoin-circle-stark",
+  "projectOwner": "Bitcoin-Wildlife-Sanctuary",
+  "files": ["bitcoin-circle-stark",
   "projectOwner": "Bitcoin-Wildlife-Sanctuary",
   "files": [
       "login": "januszgrze",
