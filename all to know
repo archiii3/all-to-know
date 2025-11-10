@@ -40,7 +40,11 @@
       "contributions": [ "angular",
   "contributorsPerLine": 7,
   "contributors": [
-    {
+    {login": "januszgrze",
+      "name": "janusz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82240624?v=4",
+      "profile": "https://github.com/januszgrze",
+      "contributions": [
       "login": "victorkstarkware",
       "name": "victorkstarkware",
       "avatar_url": "https://avatars.githubusercontent.com/u/160594433?v=4",
