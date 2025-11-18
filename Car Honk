@@ -1,0 +1,193 @@
+# Car Honk (Web)
+
+A tiny, safe demo that plays a car-honk-like sound in the browser using the Web Audio API. No audio files required — the sound is synthesized in code.
+
+## Files
+- `index.html` — single-page demo. Click the button or press `H` to honk.
+
+## Usage
+1. Clone or download this repository.
+2. Open `index.html` in a modern browser (Chrome, Firefox, Edge).
+3. Click **HONK** or press **H** to play the honk sound.
+4. Hold the button (or hold H) to sustain the honk; release to stop.
+
+> Note: For best results run from a local server (e.g. `python -m http.server`) if your browser restricts audio autoplay.
+
+## Customization
+- You can adjust `baseFreq`, `duration`, and `noiseLevel` in the script to change the character of the honk.
+- Add CSS or wrap into a larger site as needed.
+
+## License
+MIT
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Car Honk (Web)</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; margin:0; background:linear-gradient(180deg,#0f172a,#0b1220); color:#e6eef8; }
+    .card { background: rgba(255,255,255,0.03); padding: 28px; border-radius: 12px; box-shadow: 0 8px 30px rgba(2,6,23,0.6); text-align:center; width:320px; }
+    h1 { margin:0 0 8px; font-size:20px; }
+    p { margin:0 0 16px; color:#bcd2ee; font-size:14px; }
+    button { background:#ffcc00; border:none; padding:14px 20px; border-radius:10px; font-weight:700; cursor:pointer; font-size:16px; box-shadow:0 6px 18px rgba(0,0,0,0.35); }
+    button:active { transform: translateY(1px); }
+    small { display:block; margin-top:12px; color:#9fb5dd; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Car Honk — Web Demo</h1>
+    <p>Click or press <strong>H</strong> to honk. Hold to sustain.</p>
+    <button id="honkBtn" type="button">HONK</button>
+    <small>Works in modern browsers (Web Audio API).</small>
+  </div>
+
+  <script>
+  // Simple car-honk synthesizer using Web Audio API
+  // Press H to play; hold to sustain, release to stop.
+
+  let audioCtx = null;
+  let toneOsc = null;
+  let noiseNode = null;
+  let masterGain = null;
+  let isPlaying = false;
+
+  // Create an AudioContext on user interaction (required in many browsers)
+  function ensureAudioContext() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  }
+
+  // Create a noise buffer (white noise)
+  function makeNoiseBuffer(ctx) {
+    const size = 2 * ctx.sampleRate;
+    const buffer = ctx.createBuffer(1, size, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < size; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.5;
+    }
+    return buffer;
+  }
+
+  function startHonk(opts = {}) {
+    if (isPlaying) return;
+    ensureAudioContext();
+    isPlaying = true;
+
+    const baseFreq = opts.baseFreq || 220; // fundamental frequency (Hz)
+    const vibratoFreq = opts.vibratoFreq || 6; // vibrato speed (Hz)
+    const vibratoDepth = opts.vibratoDepth || 8; // vibrato depth (Hz)
+    const noiseLevel = opts.noiseLevel || 0.6;
+    const filterQ = opts.filterQ || 8;
+
+    // master gain
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.0001; // start near zero for smooth attack
+    masterGain.connect(audioCtx.destination);
+
+    // tonal oscillator
+    toneOsc = audioCtx.createOscillator();
+    toneOsc.type = 'sawtooth';
+
+    // vibrato using low-frequency oscillator
+    const lfo = audioCtx.createOscillator();
+    lfo.frequency.value = vibratoFreq;
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = vibratoDepth;
+    lfo.connect(lfoGain);
+    lfoGain.connect(toneOsc.frequency);
+
+    toneOsc.frequency.value = baseFreq;
+
+    // filter to shape the tone (like a horn resonator)
+    const band = audioCtx.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = baseFreq * 1.2;
+    band.Q.value = filterQ;
+
+    // noise source
+    const noiseBuf = makeNoiseBuffer(audioCtx);
+    noiseNode = audioCtx.createBufferSource();
+    noiseNode.buffer = noiseBuf;
+    noiseNode.loop = true;
+
+    // noise filter to remove harsh highs
+    const noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 2500;
+
+    // noise gain
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.value = noiseLevel;
+
+    // combine tone and noise
+    toneOsc.connect(band);
+    band.connect(masterGain);
+
+    noiseNode.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(masterGain);
+
+    // quick attack envelope
+    const now = audioCtx.currentTime;
+    masterGain.gain.cancelScheduledValues(now);
+    masterGain.gain.setValueAtTime(0.0001, now);
+    masterGain.gain.exponentialRampToValueAtTime(0.8, now + 0.02); // attack
+    // sustain until stop() called
+
+    // start nodes
+    toneOsc.start(now);
+    noiseNode.start(now);
+    lfo.start(now);
+
+    // store references needed for stop
+    toneOsc._lfo = lfo;
+    toneOsc._lfoGain = lfoGain;
+    toneOsc._band = band;
+    noiseNode._noiseGain = noiseGain;
+  }
+
+  function stopHonk() {
+    if (!isPlaying) return;
+    isPlaying = false;
+    const now = audioCtx.currentTime;
+
+    // release envelope
+    masterGain.gain.cancelScheduledValues(now);
+    masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+    masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+    // stop oscillators slightly after release to avoid clicks
+    setTimeout(() => {
+      try {
+        if (toneOsc) toneOsc.stop();
+        if (toneOsc && toneOsc._lfo) toneOsc._lfo.stop();
+        if (noiseNode) noiseNode.stop();
+      } catch (e) { /* ignore */ }
+
+      // disconnect everything
+      if (toneOsc) {
+        toneOsc.disconnect();
+        if (toneOsc._lfo) toneOsc._lfo.disconnect();
+        if (toneOsc._lfoGain) toneOsc._lfoGain.disconnect();
+      }
+      if (noiseNode) noiseNode.disconnect();
+      if (masterGain) masterGain.disconnect();
+
+      toneOsc = null;
+      noiseNode = null;
+      masterGain = null;
+    }, 200);
+  }
+
+  // UI wiring
+  const btn = document.getElementById('honkBtn');
+
+  // Mouse/touch: hold to sustain
+  btn.addEventListener('mousedown', (e) => { ensureAudioContext(); startHonk(); });
+  btn.addEventListener('mouseup', (e) => { stopHonk(); });
+  btn.addEventListener('mouseleave', (e) => { stopHonk(); });
+  btn.addEventListener('touchstart', (e) => { e.preventDefault(); ensureAudioContext(); startHonk(); }, {passive:false});
+  btn.addEventListener('touchend', (e) => { e.preventDefa
