@@ -191,3 +191,5 @@ MIT
   btn.addEventListener('mouseleave', (e) => { stopHonk(); });
   btn.addEventListener('touchstart', (e) => { e.preventDefault(); ensureAudioContext(); startHonk(); }, {passive:false});
   btn.addEventListener('touchend', (e) => { e.preventDefa
+# No external dependencies — plain Python 3.8+
+
