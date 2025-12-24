@@ -1,3 +1,5 @@
+This project is intended for educational purposes and demonstrates basic sound synthesis directly in the browser.
+
 # Car Honk (Web)
 
 A tiny, safe demo that plays a car-honk-like sound in the browser using the Web Audio API. No audio files required — the sound is synthesized in code.
