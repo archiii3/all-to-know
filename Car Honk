@@ -54,7 +54,9 @@ MIT
   let noiseNode = null;
   let masterGain = null;
   let isPlaying = false;
-
+<button id="honkBtn" type="button">HONK</button>
+    <small>Works in modern browsers (Web Audio API).</small>
+  </div>
   // Create an AudioContext on user interaction (required in many browsers)
   function ensureAudioContext() {
     if (!audioCtx) {
