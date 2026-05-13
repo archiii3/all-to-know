@@ -6,7 +6,13 @@ A tiny, safe demo that plays a car-honk-like sound in the browser using the Web 
 
 ## Files
 - `index.html` — single-page demo. Click the button or press `H` to honk.
-
+"script_keys": [
+    {"id": "FIRST_DEPLOYMENT_ID",  "account": "acct-a"},
+    {"id": "SECOND_DEPLOYMENT_ID", "account": "acct-a"},
+    {"id": "THIRD_DEPLOYMENT_ID",  "account": "acct-b"},
+    {"id": "FOURTH_DEPLOYMENT_ID", "account": "acct-b"}
+  ]
+}
 ## Usage
 1. Clone or download this repository.
 2. Open `index.html` in a modern browser (Chrome, Firefox, Edge).
